@@ -1,0 +1,43 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+
+- task: TerraformCLI@0
+  inputs:
+    command: 'validate'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/firewall'
+    allowTelemetryCollection: true
+
+- task: TerraformCLI@0
+  inputs:
+    command: 'init'
+    backendType: 'azurerm'
+    backendServiceArm: 'Azure-Resources'
+    backendAzureRmResourceGroupName: 'storage-rg'
+    backendAzureRmStorageAccountName: 'musastorage112233'
+    backendAzureRmContainerName: 'tfcont'
+    backendAzureRmKey: 'tfstatekey'
+    allowTelemetryCollection: true
+
+- task: TerraformCLI@0
+  inputs:
+    command: 'apply'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/firewall'
+    environmentServiceName: 'Azure-Resources'
+    allowTelemetryCollection: true
